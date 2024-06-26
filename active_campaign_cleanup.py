@@ -72,7 +72,6 @@ VALID_SECTORS = ["BU", "ED", "GO", "IN", "ING", "PA", "PT", "SS", "SW"]
 
 VALID_CONSENTS = ["Yes", "No", "Implied", "Shared"]
 
-
 ## Program Starts
 print("*** Welcome to AC Contact Cleanup! ***")
 print("Please select your properly formatted excel file:")
@@ -109,6 +108,8 @@ try:
     print("")
 
     print("*** DATA VALIDATION: ***")
+
+    validation_passed = True
  
     for index, row in excel_data.iterrows():
 
@@ -117,25 +118,37 @@ try:
         ## Check for valid email format.
         if type(row["Email"]) != type("String") or not re.match(r"[^@]+@[^@]+\.[^@]+", row["Email"]):
             print(f"Invalid Email on row {index + 2}: {row["Email"]}")
+            validation_passed = False
         
         ## Check valid Sector code.
         if row["Sector"] not in VALID_SECTORS:
             print(f"Invalid Sector Code on row {index + 2}: {row['Sector']}")
+            validation_passed = False
 
         # Check for valid country.
         if row["Country"] not in VALID_COUNTRIES:
             print(f"Invalid Country on row {index + 2}: {row['Country']}")
+            validation_passed = False
     
         ## Check valid code.
         if row["Province/State"] not in VALID_PROVINCES_STATES:
             print(f"Invalid Province Code on row {index + 2}: {row["Province/State"]}")
+            validation_passed = False
 
         # Check for valid consent.
         if row["Consent"] not in VALID_CONSENTS:
             print(f"Invalid Consent on row {index + 2}: {row['Consent']}")
+            validation_passed = False
 
     print("**************************************")
     print("")
+
+    if validation_passed:
+        print("ALL DATA IS CLEAN! Download your spreadsheet as .CSV and then upload to Active Campaign.")
+        print("")
+    else:
+        print("DATA HAS ERRORS. Please make changes and re-run this script.")
+        print("")
 
     # Will create new file for testing. append "CLEANED to file path name"
     file_path = Path(filepath)
@@ -147,12 +160,13 @@ try:
     print(f"Cleaned data has been saved to {new_filepath}")
 
 except PermissionError as pe:
-    print("PERMISSION ERROR: The Excel file must be closed to run this script. Please close and run again.")
+    print("PERMISSION ERROR: The Excel file must be closed to run this script. Please close the Excel file and run again.")
     print(f"Exception details: {pe}")
 except Exception as e:
     print("ERROR: Please contact jfhhamilton@gmail.com for support :)")
     print(f"Exception details: {e}")
 
-# TODO Change so that it overwrites the file. 
 # Message when everything is valid + next steps.
+# TODO Change so that it overwrites the file. 
+
 
