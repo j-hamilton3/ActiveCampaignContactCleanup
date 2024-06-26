@@ -1,16 +1,8 @@
-# Required Fields:
-# (Email, Sector, Country, Province/State, Consent)
-
-# Process:
-	# Remove spaces from email, valid email.
-
-	# Check for Provinces/States (LIST ON ACTIVE CAMPAIGN) 
-    # - Valid two digit province/state code. (Make sure everthing is uppercase.)
-
-	# Check for Valid Country (LIST ON ACTIVE CAMPAIGN)
-
-	# Check for Valid Sector (LIST ON ACTIVE CAMPAIGN) 
-    # If there are blanks fill with default (CTRI - SS, ACHIEVE - GO ) (Make sure everything is uppercase.)
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+import pandas as pd
+import re
+from pathlib import Path
 
 VALID_PROVINCES_STATES = [
     "AB", "MB", "SK", "BC", "ON", "QC", "NS", "NB", "NL", "PE",
@@ -74,4 +66,93 @@ VALID_COUNTRIES = [
     "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Wallis and Futuna",
     "Western Sahara", "Yemen", "Zambia", "Zimbabwe"
 ]
+
+
+VALID_SECTORS = ["BU", "ED", "GO", "IN", "ING", "PA", "PT", "SS", "SW"]
+
+VALID_CONSENTS = ["Yes", "No", "Implied", "Shared"]
+
+
+## Program Starts
+print("*** Welcome to AC Contact Cleanup! ***")
+print("Please select your properly formatted excel file:")
+print("WARNING - File contents will be overwritten.")
+print("**************************************")
+print()
+
+## Prompt User to Select a file.
+filepath= askopenfilename()
+
+try:
+    excel_data = pd.read_excel(filepath)
+
+    for index, row in excel_data.iterrows():
+        
+        ## DATA SANITIZATION
+
+        ## Remove Spaces from email
+        if pd.notna(row["Email"]):
+            excel_data.at[index, 'Email'] = row["Email"].replace(" ", "")
+    
+        ## Capitalize sector code, remove spaces.
+        if isinstance(row["Sector"], str):
+            excel_data.at[index, 'Sector'] = row["Sector"].upper().replace(" ", "")
+
+        ## Capitalize province/state code, remove spaces.
+        if isinstance(row["Province/State"], str):
+            excel_data.at[index, 'Province/State'] = row["Province/State"].upper().replace(" ", "")
+
+    print("*** DATA SANITIZATION ***")
+    print("Removed spaces all from Email, Sector, and Province/State records.")
+    print("Capitalized Sector and Province/State codes.")
+    print("**************************************")
+    print("")
+
+    print("*** DATA VALIDATION: ***")
+ 
+    for index, row in excel_data.iterrows():
+
+        ## DATA VALIDATION
+
+        ## Check for valid email format.
+        if type(row["Email"]) != type("String") or not re.match(r"[^@]+@[^@]+\.[^@]+", row["Email"]):
+            print(f"Invalid Email on row {index + 2}: {row["Email"]}")
+        
+        ## Check valid Sector code.
+        if row["Sector"] not in VALID_SECTORS:
+            print(f"Invalid Sector Code on row {index + 2}: {row['Sector']}")
+
+        # Check for valid country.
+        if row["Country"] not in VALID_COUNTRIES:
+            print(f"Invalid Country on row {index + 2}: {row['Country']}")
+    
+        ## Check valid code.
+        if row["Province/State"] not in VALID_PROVINCES_STATES:
+            print(f"Invalid Province Code on row {index + 2}: {row["Province/State"]}")
+
+        # Check for valid consent.
+        if row["Consent"] not in VALID_CONSENTS:
+            print(f"Invalid Consent on row {index + 2}: {row['Consent']}")
+
+    print("**************************************")
+    print("")
+
+    # Will create new file for testing. append "CLEANED to file path name"
+    file_path = Path(filepath)
+    new_filepath = file_path.with_name(file_path.stem + "-CLEANED" + file_path.suffix)
+
+    # Save the cleaned data to the new file
+    excel_data.to_excel(new_filepath, index=False)
+
+    print(f"Cleaned data has been saved to {new_filepath}")
+
+except PermissionError as pe:
+    print("PERMISSION ERROR: The Excel file must be closed to run this script. Please close and run again.")
+    print(f"Exception details: {pe}")
+except Exception as e:
+    print("ERROR: Please contact jfhhamilton@gmail.com for support :)")
+    print(f"Exception details: {e}")
+
+# TODO Change so that it overwrites the file. 
+# Message when everything is valid + next steps.
 
