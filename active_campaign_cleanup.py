@@ -102,7 +102,7 @@ try:
             excel_data.at[index, 'Province/State'] = row["Province/State"].upper().replace(" ", "")
 
     print("*** DATA SANITIZATION ***")
-    print("Removed spaces all from Email, Sector, and Province/State records.")
+    print("Removed all spaces from Email, Sector, and Province/State records.")
     print("Capitalized Sector and Province/State codes.")
     print("**************************************")
     print("")
@@ -132,7 +132,7 @@ try:
     
         ## Check valid code.
         if row["Province/State"] not in VALID_PROVINCES_STATES:
-            print(f"Invalid Province Code on row {index + 2}: {row["Province/State"]}")
+            print(f"Invalid Province/State Code on row {index + 2}: {row["Province/State"]}")
             validation_passed = False
 
         # Check for valid consent.
@@ -150,14 +150,12 @@ try:
         print("DATA HAS ERRORS. Please make changes and re-run this script.")
         print("")
 
-    # Will create new file for testing. append "CLEANED to file path name"
-    file_path = Path(filepath)
-    new_filepath = file_path.with_name(file_path.stem + "-CLEANED" + file_path.suffix)
+    # Save the cleaned data to the original file
+    excel_data.to_excel(filepath, index=False)
 
-    # Save the cleaned data to the new file
-    excel_data.to_excel(new_filepath, index=False)
-
-    print(f"Cleaned data has been saved to {new_filepath}")
+    print(f"Data has been saved to {filepath}")
+    print("")
+    input("Press Enter to exit...")
 
 except PermissionError as pe:
     print("PERMISSION ERROR: The Excel file must be closed to run this script. Please close the Excel file and run again.")
@@ -165,8 +163,6 @@ except PermissionError as pe:
 except Exception as e:
     print("ERROR: Please contact jfhhamilton@gmail.com for support :)")
     print(f"Exception details: {e}")
-
-# Message when everything is valid + next steps.
-# TODO Change so that it overwrites the file. 
+ 
 
 
