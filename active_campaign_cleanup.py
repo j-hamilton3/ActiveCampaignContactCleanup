@@ -160,9 +160,11 @@ try:
 except PermissionError as pe:
     print("PERMISSION ERROR: The Excel file must be closed to run this script. Please close the Excel file and run again.")
     print(f"Exception details: {pe}")
+    input("Press Enter to exit...")
 except Exception as e:
     print("ERROR: Please contact jfhhamilton@gmail.com for support :)")
     print(f"Exception details: {e}")
+    input("Press Enter to exit...")
  
 
 
